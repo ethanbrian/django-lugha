@@ -41,8 +41,8 @@ INSTALLED_APPS = [
 ]
 
 CORS_ALLOWED_ORIGINS = [
-     "ec2-54-209-165-145.compute-1.amazonaws.com:80",
-    "ec2-54-209-165-145.compute-1.amazonaws.com:8000",
+     "http://ec2-54-209-165-145.compute-1.amazonaws.com:80",
+    "http://ec2-54-209-165-145.compute-1.amazonaws.com:8000",
 ]
 
 CORS_ALLOW_ALL_ORIGINS = True
