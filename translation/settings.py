@@ -40,11 +40,19 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 ]
 
+CORS_ALLOWED_ORIGINS = [
+     "ec2-54-209-165-145.compute-1.amazonaws.com:80",
+    "ec2-54-209-165-145.compute-1.amazonaws.com:8000",
+]
+
+CORS_ALLOW_ALL_ORIGINS = True
+
 
 
 
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',  # Make sure it's one of the first middleware classes
     'django.middleware.common.CommonMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
