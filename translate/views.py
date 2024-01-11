@@ -11,6 +11,9 @@ class TranslationDetailsView(View):
         return super().dispatch(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
+        # Log the Host header value
+        host_header = request.headers.get('Host')
+        print(f'Received Host header: {host_header}')
         # Replace 'your_hf_token' with your actual Hugging Face API token
         hf_token = "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"
         headers = {
