@@ -29,7 +29,7 @@ class TranslationDetailsView(View):
             language_id = data.get('languageId')
 
             # Make an HTTP POST request to fetch translation details dynamically
-            spring_boot_url = "http://ec2-54-209-165-145.compute-1.amazonaws.com:8080/get_translation_details"
+            spring_boot_url = "http://ec2-54-173-58-21.compute-1.amazonaws.com:8080/get_translation_details"
             response = requests.post(spring_boot_url, json={'translationId': translation_id, 'languageId': language_id}, headers=headers)
             translation_response = response.json()
             print(translation_response)
