@@ -43,8 +43,8 @@ INSTALLED_APPS = [
 ]
 
 CORS_ALLOWED_ORIGINS = [
-     "http://http://lugha-front.s3-website-us-east-1.amazonaws.com:80",
-    "http://http://lugha-front.s3-website-us-east-1.amazonaws.com:8000",
+     "https://translate.drlugha.com:80",
+    "https://translate.drlugha.com:8000",
 ]
 
 CORS_ALLOW_ALL_ORIGINS = True
