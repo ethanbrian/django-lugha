@@ -20,4 +20,9 @@ EXPOSE 8000
 ENV DJANGO_SETTINGS_MODULE=translation.settings
 
 # Run Gunicorn when the container launches
-CMD ["gunicorn", "translation.wsgi:application", "-b", "0.0.0.0:8000"]
+CMD ["gunicorn", "translation.wsgi:application", 
+    "--bind", "0.0.0.0:8000",  # Adjust the binding address and port
+    "--certfile", "/etc/letsencrypt/live/djangoapi.drlugha.com/fullchain.pem",  # Full certificate chain
+    "--keyfile", "/etc/letsencrypt/live/djangoapi.drlugha.com/privkey.pem",      # Private key
+    "--workers", "3",  # Number of Gunicorn worker processes
+    "--preload"]

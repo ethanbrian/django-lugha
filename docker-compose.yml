@@ -1,8 +1,15 @@
 version: '3'
+
 services:
   web:
     build: .
-    command: gunicorn translation.wsgi:application -b 0.0.0.0:8000
+    command: >
+      gunicorn translation.wsgi:application
+      --bind 0.0.0.0:8000
+      --certfile /etc/letsencrypt/live/djangoapi.drlugha.com/fullchain.pem
+      --keyfile /etc/letsencrypt/live/djangoapi.drlugha.com/privkey.pem
+      --workers 3
+      --preload
     volumes:
       - .:/app
     ports:
