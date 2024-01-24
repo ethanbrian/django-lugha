@@ -74,7 +74,7 @@ tqdm==4.66.1
 transformers==4.35.2
 typing_extensions==4.8.0
 tzdata==2023.3
-urllib3==2.0.4
+urllib3==1.25.11
 virtualenv==20.24.2
 virtualenv-clone==0.5.7
 xxhash==3.4.1
