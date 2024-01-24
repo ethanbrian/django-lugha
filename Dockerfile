@@ -7,6 +7,9 @@ WORKDIR /app
 # Copy the current directory contents into the container at /app
 COPY . /app
 
+# Install Gunicorn
+RUN pip install gunicorn
+
 # Install any needed packages specified in requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
@@ -16,5 +19,5 @@ EXPOSE 8000
 # Define environment variable
 ENV DJANGO_SETTINGS_MODULE=translation.settings
 
-# Run the application when the container launches
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+# Run Gunicorn when the container launches
+CMD ["gunicorn", "translation.wsgi:application", "-b", "0.0.0.0:8000"]
