@@ -21,8 +21,8 @@ from translate.views import TranslationDetailsView
 urlpatterns = [
     # Other paths
     # Include your existing URL paths here
- path('get_translation_details', TranslationDetailsView.as_view(), name='get_translation_details'),
- path('voice/response/', VoiceResponseView.as_view(), name='voice_response'),  # Add the new URL pattern
+ path('get_translation_details', TranslationDetailsView.as_view(), name='get_translation_details')
+#  path('voice/response/', VoiceResponseView.as_view(), name='voice_response'),  # Add the new URL pattern
   
 ]
 
