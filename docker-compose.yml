@@ -12,5 +12,8 @@ services:
       --preload
     volumes:
       - .:/app
+      - /etc/letsencrypt/live/djangoapi.drlugha.com/fullchain.pem:/etc/letsencrypt/live/djangoapi.drlugha.com/fullchain.pem
+      - /etc/letsencrypt/live/djangoapi.drlugha.com/privkey.pem:/etc/letsencrypt/live/djangoapi.drlugha.com/privkey.pem
     ports:
       - "8000:8000"
+
