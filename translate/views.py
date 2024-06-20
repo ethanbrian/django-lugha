@@ -3,6 +3,8 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views import View
 from gradio_client import Client
+import json
+import requests
 
 @method_decorator(csrf_exempt, name='dispatch')
 class TranslationDetailsView(View):
@@ -50,9 +52,18 @@ class TranslationDetailsView(View):
                 return JsonResponse({
                     'error': 'Error fetching translation details',
                     'translation_response': translation_response
-                })
+                }, status=response.status_code)
+        except json.JSONDecodeError:
+            return JsonResponse({
+                'error': 'Invalid JSON format'
+            }, status=400)
+        except requests.RequestException as e:
+            return JsonResponse({
+                'error': 'Error fetching translation details from Spring Boot service',
+                'message': str(e)
+            }, status=500)
         except Exception as e:
             return JsonResponse({
                 'error': 'Internal Server Error',
                 'message': str(e),
-            })
+            }, status=500)
