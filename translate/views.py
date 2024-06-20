@@ -39,11 +39,15 @@ class TranslationDetailsView(View):
                 target_language_id = translation_response.get('target_language_id')
 
                 # Step 2: Use Gradio Client to initiate translation
-                client = Client(space=f"{source_language_id}/en2{target_language_id}")  # Adjust space based on your Gradio setup
-                result = client.submit(source_text, api_name="/predict")
+                # Adjust the Client initialization according to Gradio's API
+                client = Client("DrLugha/translate-api")  # Replace with your specific Gradio space name
+                job = client.submit(source_text, api_name="/predict")
+
+                # Wait for the job to complete and get the result
+                result = job.result()
 
                 # Handle the result
-                translated_text = result.data
+                translated_text = result['data']
 
                 return JsonResponse({
                     'translated_text': translated_text,
