@@ -42,6 +42,7 @@ INSTALLED_APPS = [
 CORS_ALLOWED_ORIGINS = [
     "https://translate.drlugha.com:80",
     "https://translate.drlugha.com:8000",
+    "https://springlugha.drlugha.com",
 ]
 
 CORS_ALLOW_ALL_ORIGINS = True
