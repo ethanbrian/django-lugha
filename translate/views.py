@@ -1,11 +1,10 @@
-from django.http import JsonResponse, HttpResponse
+from django.http import JsonResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views import View
 import requests
 import json
 import time
-import base64
 
 @method_decorator(csrf_exempt, name='dispatch')
 class TranslationDetailsView(View):
@@ -39,12 +38,12 @@ class TranslationDetailsView(View):
                     translation_response['source_text'],
                 ]
 
-                hf_response = requests.post("https://drlugha-translate-api.hf.space/run/predict", headers=headers, json={"data": data_payload})
-                hf_response_content = hf_response.json()
+                initial_response = requests.post("https://drlugha-translate-api.hf.space/run/predict", headers=headers, json={"data": data_payload})
+                initial_response_content = initial_response.json()
 
-                if hf_response.status_code == 200:
-                    # Poll for the result if the response indicates queuing
-                    task_id = hf_response_content.get('task_id')
+                if initial_response.status_code == 200:
+                    # Check if the response contains a task_id to indicate queuing
+                    task_id = initial_response_content.get('task_id')
                     if task_id:
                         poll_url = f"https://drlugha-translate-api.hf.space/run/poll/{task_id}"
                         result = None
@@ -57,18 +56,18 @@ class TranslationDetailsView(View):
                                 break
                         if result:
                             return JsonResponse({
-                                'hugging_face_status_code': hf_response.status_code,
+                                'hugging_face_status_code': initial_response.status_code,
                                 'translated_text': result,
                                 'generated_translation_id': translation_response.get('translation_id'),
                             })
                         else:
                             return JsonResponse({'error': 'Timeout waiting for Hugging Face API response'})
                     else:
-                        return JsonResponse({'error': 'Unexpected response from Hugging Face API'})
+                        return JsonResponse({'error': 'Unexpected response from Hugging Face API: no task_id found'})
                 else:
                     return JsonResponse({
                         'error': 'Error from Hugging Face API',
-                        'hugging_face_response_content': hf_response_content,
+                        'hugging_face_response_content': initial_response_content,
                     })
             else:
                 return JsonResponse({
