@@ -38,15 +38,17 @@ class TranslationDetailsView(View):
                 source_language_id = translation_response.get('source_language_id')
                 target_language_id = translation_response.get('target_language_id')
 
-                # Step 2: Prepare data payload for queuing translation task
+                # Step 2: Prepare data payload for Hugging Face API
                 data_payload = {
-                    'source_text': source_text,
-                    'source_language_id': source_language_id,
-                    'target_language_id': target_language_id
+                    'data': [
+                        f"{translation_response['source_language_name']} ({translation_response['source_abbreviation']})",
+                        f"{translation_response['target_name']} ({translation_response['target_abbreviation']})",
+                        source_text
+                    ]
                 }
 
                 # Step 3: Call Hugging Face API to initiate translation
-                initial_response = requests.post("https://drlugha-translate-api.hf.space/run/predict", headers=headers, json={"data": data_payload})
+                initial_response = requests.post("https://drlugha-translate-api.hf.space/run/predict", headers=headers, json=data_payload)
                 initial_response_content = initial_response.json()
 
                 if initial_response.status_code == 200:
