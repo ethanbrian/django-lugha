@@ -27,24 +27,28 @@ class TranslationDetailsView(View):
             translation_id = data.get('translationId')
             language_id = data.get('languageId')
 
+            # Step 1: Call Spring Boot endpoint to fetch translation details
             spring_boot_url = "https://springlugha.drlugha.com/get_translation_details"
             response = requests.post(spring_boot_url, json={'translationId': translation_id, 'languageId': language_id}, headers=headers)
             translation_response = response.json()
 
             if response.status_code == 200:
+                # Step 2: Prepare data payload for Hugging Face API
                 data_payload = [
                     f"{translation_response['source_language_name']} ({translation_response['source_abbreviation']})",
                     f"{translation_response['target_name']} ({translation_response['target_abbreviation']})",
                     translation_response['source_text'],
                 ]
 
+                # Step 3: Call Hugging Face API to initiate translation
                 initial_response = requests.post("https://drlugha-translate-api.hf.space/run/predict", headers=headers, json={"data": data_payload})
                 initial_response_content = initial_response.json()
 
                 if initial_response.status_code == 200:
-                    # Check if the response contains a task_id to indicate queuing
+                    # Step 4: Check if the response contains a task_id to indicate queuing
                     task_id = initial_response_content.get('task_id')
                     if task_id:
+                        # Step 5: Poll for result asynchronously
                         return self.poll_for_result(task_id, headers, translation_response.get('translation_id'))
                     else:
                         return JsonResponse({'error': 'Unexpected response from Hugging Face API: no task_id found'})
