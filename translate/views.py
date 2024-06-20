@@ -33,13 +33,35 @@ class TranslationDetailsView(View):
             translation_response = response.json()
 
             if response.status_code == 200:
-                # Step 2: Queue the translation task using Hugging Face API
-                queue_response = self.queue_translation_task(translation_response, headers)
-                if queue_response.get('task_id'):
-                    # Step 3: Poll for result asynchronously
-                    return self.poll_for_result(queue_response['task_id'], headers, translation_response.get('translation_id'))
+                # Extract necessary data from translation_response
+                source_text = translation_response.get('source_text')
+                source_language_id = translation_response.get('source_language_id')
+                target_language_id = translation_response.get('target_language_id')
+
+                # Step 2: Prepare data payload for queuing translation task
+                data_payload = {
+                    'source_text': source_text,
+                    'source_language_id': source_language_id,
+                    'target_language_id': target_language_id
+                }
+
+                # Step 3: Call Hugging Face API to initiate translation
+                initial_response = requests.post("https://drlugha-translate-api.hf.space/run/predict", headers=headers, json={"data": data_payload})
+                initial_response_content = initial_response.json()
+
+                if initial_response.status_code == 200:
+                    # Step 4: Check if the response contains a task_id to indicate queuing
+                    task_id = initial_response_content.get('task_id')
+                    if task_id:
+                        # Step 5: Poll for result asynchronously
+                        return self.poll_for_result(task_id, headers, translation_id)
+                    else:
+                        return JsonResponse({'error': 'Unexpected response from Hugging Face API: no task_id found'})
                 else:
-                    return JsonResponse({'error': 'Failed to queue translation task'})
+                    return JsonResponse({
+                        'error': 'Error from Hugging Face API',
+                        'hugging_face_response_content': initial_response_content,
+                    })
             else:
                 return JsonResponse({
                     'error': 'Error fetching translation details',
@@ -51,20 +73,9 @@ class TranslationDetailsView(View):
                 'message': str(e),
             })
 
-    def queue_translation_task(self, translation_response, headers):
-        data_payload = {
-            'source_text': translation_response['source_text'],
-            'source_language_id': translation_response['source_language_id'],
-            'target_language_id': translation_response['target_language_id']
-        }
-
-        queue_url = "https://drlugha-translate-api.hf.space/run/queue"
-        queue_response = requests.post(queue_url, json=data_payload, headers=headers)
-        return queue_response.json()
-
     def poll_for_result(self, task_id, headers, generated_translation_id):
         poll_url = f"https://drlugha-translate-api.hf.space/run/poll/{task_id}"
-        for _ in range(30):  # Poll up to 30 times (adjust based on your requirement)
+        for _ in range(30):  # Poll up to 30 times (example)
             time.sleep(2)  # Wait for 2 seconds before polling again
             poll_response = requests.get(poll_url, headers=headers)
             poll_response_content = poll_response.json()
@@ -75,10 +86,4 @@ class TranslationDetailsView(View):
                     'translated_text': result,
                     'generated_translation_id': generated_translation_id,
                 })
-            elif poll_response_content.get('status') == 'failed':
-                return JsonResponse({
-                    'error': 'Translation failed',
-                    'details': poll_response_content.get('error_message', 'Unknown error'),
-                })
-
         return JsonResponse({'error': 'Timeout waiting for Hugging Face API response'})
