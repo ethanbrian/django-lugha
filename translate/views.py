@@ -45,23 +45,7 @@ class TranslationDetailsView(View):
                     # Check if the response contains a task_id to indicate queuing
                     task_id = initial_response_content.get('task_id')
                     if task_id:
-                        poll_url = f"https://drlugha-translate-api.hf.space/run/poll/{task_id}"
-                        result = None
-                        for _ in range(30):  # Poll up to 30 times (example)
-                            time.sleep(2)  # Wait for 2 seconds before polling again
-                            poll_response = requests.get(poll_url, headers=headers)
-                            poll_response_content = poll_response.json()
-                            if poll_response_content.get('status') == 'completed':
-                                result = poll_response_content.get('data', [''])[0].strip()
-                                break
-                        if result:
-                            return JsonResponse({
-                                'hugging_face_status_code': initial_response.status_code,
-                                'translated_text': result,
-                                'generated_translation_id': translation_response.get('translation_id'),
-                            })
-                        else:
-                            return JsonResponse({'error': 'Timeout waiting for Hugging Face API response'})
+                        return self.poll_for_result(task_id, headers, translation_response.get('translation_id'))
                     else:
                         return JsonResponse({'error': 'Unexpected response from Hugging Face API: no task_id found'})
                 else:
@@ -79,3 +63,18 @@ class TranslationDetailsView(View):
                 'error': 'Internal Server Error',
                 'message': str(e),
             })
+
+    def poll_for_result(self, task_id, headers, generated_translation_id):
+        poll_url = f"https://drlugha-translate-api.hf.space/run/poll/{task_id}"
+        for _ in range(30):  # Poll up to 30 times (example)
+            time.sleep(2)  # Wait for 2 seconds before polling again
+            poll_response = requests.get(poll_url, headers=headers)
+            poll_response_content = poll_response.json()
+            if poll_response_content.get('status') == 'completed':
+                result = poll_response_content.get('data', [''])[0].strip()
+                return JsonResponse({
+                    'hugging_face_status_code': poll_response.status_code,
+                    'translated_text': result,
+                    'generated_translation_id': generated_translation_id,
+                })
+        return JsonResponse({'error': 'Timeout waiting for Hugging Face API response'})
