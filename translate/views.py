@@ -15,7 +15,7 @@ class TranslationDetailsView(View):
         host_header = request.headers.get('Host')
         print(f'Received Host header: {host_header}')
         
-        hf_token = "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"  # Replace with your actual Hugging Face token
+        hf_token = "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"  # Replace with your actual Hugging Face token
         headers = {
             "Authorization": "Bearer " + hf_token,
             "Content-Type": "application/json",
