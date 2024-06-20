@@ -15,7 +15,7 @@ class TranslationDetailsView(View):
         host_header = request.headers.get('Host')
         print(f'Received Host header: {host_header}')
         
-        hf_token = "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"
+        hf_token = "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"  # Replace with your actual Hugging Face token
         headers = {
             "Authorization": "Bearer " + hf_token,
             "Content-Type": "application/json",
@@ -39,11 +39,8 @@ class TranslationDetailsView(View):
                 target_language_id = translation_response.get('target_language_id')
 
                 # Step 2: Use Gradio Client to initiate translation
-                client = Client("https://huggingface.co/spaces/DrLugha/translate-api")
-                job = client.submit(source_text, api_name="/predict")
-
-                # Wait for the job to complete and get the result
-                result = job.result()
+                client = Client("DrLugha/translate-api", hf_token=hf_token)  # Authenticate with the token
+                result = client.predict(source_text, api_name="/predict")
 
                 # Handle the result
                 translated_text = result['data']
