@@ -15,7 +15,7 @@ class TranslationDetailsView(View):
         host_header = request.headers.get('Host')
         print(f'Received Host header: {host_header}')
         
-        hf_token = "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"  # Replace with your actual Hugging Face token
+        hf_token = "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"  # Replace with your actual Hugging Face token
         headers = {
             "Authorization": f"Bearer {hf_token}",
             "Content-Type": "application/json",
@@ -35,14 +35,20 @@ class TranslationDetailsView(View):
             if response.status_code == 200:
                 # Extract necessary data from translation_response
                 source_text = translation_response.get('source_text')
-                source_language_id = translation_response.get('source_language_id')
-                target_language_id = translation_response.get('target_language_id')
+                source_name = translation_response.get('source_name')
+                source_abbreviation = translation_response.get('source_abbreviation')
+                target_name = translation_response.get('target_name')
+                target_abbreviation = translation_response.get('target_abbreviation')
+
+                # Construct the src and tgt parameters
+                src = f"{source_name} ({source_abbreviation})"
+                tgt = f"{target_name} ({target_abbreviation})"
 
                 # Step 2: Use Gradio Client to initiate translation
                 client = Client("DrLugha/translate-api", hf_token=hf_token)  # Authenticate with the token
                 result = client.predict(
-                    src=source_language_id,
-                    tgt=target_language_id,
+                    src=src,
+                    tgt=tgt,
                     text=source_text,
                     api_name="/predict"
                 )
