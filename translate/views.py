@@ -56,7 +56,7 @@ class TranslationDetailsView(View):
                 # Debug print to inspect the result structure
                 print("Prediction Result:", result)
 
-                # Handle the result
+                # Validate the response structure
                 if isinstance(result, dict) and 'data' in result:
                     translated_text = result['data']
                 else:
