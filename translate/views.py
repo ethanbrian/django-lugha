@@ -15,7 +15,7 @@ class TranslationDetailsView(View):
         host_header = request.headers.get('Host')
         print(f'Received Host header: {host_header}')
         
-        hf_token = "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"  # Replace with your actual Hugging Face token
+        hf_token = "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"  # Replace with your actual Hugging Face token
         headers = {
             "Authorization": f"Bearer {hf_token}",
             "Content-Type": "application/json",
@@ -53,8 +53,14 @@ class TranslationDetailsView(View):
                     api_name="/predict"
                 )
 
+                # Debug print to inspect the result structure
+                print("Prediction Result:", result)
+
                 # Handle the result
-                translated_text = result['data']
+                if isinstance(result, dict) and 'data' in result:
+                    translated_text = result['data']
+                else:
+                    raise ValueError("Unexpected response format from translation API")
 
                 return JsonResponse({
                     'translated_text': translated_text,
@@ -71,6 +77,11 @@ class TranslationDetailsView(View):
         except requests.RequestException as e:
             return JsonResponse({
                 'error': 'Error fetching translation details from Spring Boot service',
+                'message': str(e)
+            }, status=500)
+        except ValueError as e:
+            return JsonResponse({
+                'error': 'Error processing translation API response',
                 'message': str(e)
             }, status=500)
         except Exception as e:
