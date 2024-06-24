@@ -62,8 +62,8 @@ class TranslationDetailsView(View):
                 print("Prediction Result:", result)
 
                 # Validate the response structure
-                if isinstance(result, dict) and 'data' in result:
-                    translated_text = result['data']
+                if isinstance(result, str):
+                    translated_text = result
                 else:
                     raise ValueError("Unexpected response format from translation API")
 
