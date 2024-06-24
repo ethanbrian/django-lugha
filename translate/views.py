@@ -17,7 +17,7 @@ class TranslationDetailsView(View):
         
         hf_token = "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"  # Replace with your actual Hugging Face token
         headers = {
-            "Authorization": "Bearer " + hf_token,
+            "Authorization": f"Bearer {hf_token}",
             "Content-Type": "application/json",
             "X-CSRFToken": request.headers.get('X-CSRFToken')
         }
@@ -40,7 +40,12 @@ class TranslationDetailsView(View):
 
                 # Step 2: Use Gradio Client to initiate translation
                 client = Client("DrLugha/translate-api", hf_token=hf_token)  # Authenticate with the token
-                result = client.predict(source_text, api_name="/predict")
+                result = client.predict(
+                    src=source_language_id,
+                    tgt=target_language_id,
+                    text=source_text,
+                    api_name="/predict"
+                )
 
                 # Handle the result
                 translated_text = result['data']
