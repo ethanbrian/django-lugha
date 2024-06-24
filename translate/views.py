@@ -27,10 +27,14 @@ class TranslationDetailsView(View):
             translation_id = data.get('translationId')
             language_id = data.get('languageId')
 
+            print(f"Received translationId: {translation_id}, languageId: {language_id}")
+
             # Step 1: Call Spring Boot endpoint to fetch translation details
             spring_boot_url = "https://springlugha.drlugha.com/get_translation_details"
             response = requests.post(spring_boot_url, json={'translationId': translation_id, 'languageId': language_id}, headers=headers)
             translation_response = response.json()
+
+            print("Translation response:", translation_response)
 
             if response.status_code == 200:
                 # Extract necessary data from translation_response
@@ -44,6 +48,8 @@ class TranslationDetailsView(View):
                 src = f"{source_name} ({source_abbreviation})"
                 tgt = f"{target_name} ({target_abbreviation})"
 
+                print(f"Using src: {src}, tgt: {tgt}, text: {source_text}")
+
                 # Step 2: Use Gradio Client to initiate translation
                 client = Client("DrLugha/translate-api", hf_token=hf_token)  # Authenticate with the token
                 result = client.predict(
@@ -53,7 +59,6 @@ class TranslationDetailsView(View):
                     api_name="/predict"
                 )
 
-                # Debug print to inspect the result structure
                 print("Prediction Result:", result)
 
                 # Validate the response structure
@@ -62,6 +67,7 @@ class TranslationDetailsView(View):
                 else:
                     raise ValueError("Unexpected response format from translation API")
 
+                # Return JSON response with translated_text
                 return JsonResponse({
                     'translated_text': translated_text,
                 })
